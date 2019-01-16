@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.user00.domjnate</groupId>
+    <artifactId>domjnate</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>domjnate-javafx</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Domjnate JavaFX</name>
+  <description>Variant of Domjnate for JavaFX</description>
+  
+  <dependencies>
+	<dependency>
+    	<groupId>com.google.jsinterop</groupId>
+    	<artifactId>jsinterop-annotations</artifactId>
+    	<version>1.0.2</version>
+	</dependency>
+	<dependency>
+    	<groupId>org.openjfx</groupId>
+    	<artifactId>javafx-web</artifactId>
+    	<version>11.0.1</version>
+    	<scope>provided</scope>
+	</dependency>
+	<dependency>
+    	<groupId>org.openjfx</groupId>
+    	<artifactId>javafx-swing</artifactId>
+    	<version>11.0.1</version>
+    	<scope>provided</scope>
+	</dependency>
+	
+  
+  </dependencies>
+  
+</project>
