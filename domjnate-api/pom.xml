@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-  	<groupId>com.user00.domjnate</groupId>
-  	<artifactId>domjnate</artifactId>
-  	<version>0.1.0-SNAPSHOT</version>
+    <groupId>com.user00.domjnate</groupId>
+    <artifactId>domjnate</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>domjnate-base</artifactId>
+  <artifactId>domjnate-api</artifactId>
   <packaging>jar</packaging>
 
-  <name>Domjnate Base</name>
-  <description>Core classes needed for different Domjante variants</description>
+  <name>Domjnate API</name>
+  <description>Java-bindings/wrapper for JavaScript DOM APIs</description>
   
   <dependencies>
 	<dependency>
@@ -17,7 +17,11 @@
     	<artifactId>jsinterop-annotations</artifactId>
     	<version>1.0.2</version>
 	</dependency>
+    <dependency>
+	  <groupId>com.user00.domjnate</groupId>
+	  <artifactId>domjnate-base</artifactId>
+	  <version>0.1.0-SNAPSHOT</version>
+    </dependency>
   
   </dependencies>
-  
 </project>

@@ -27,6 +27,7 @@
   
   <modules>
   	<module>domjnate-base</module>
+  	<module>domjnate-api</module>
   	<module>domjnate-javafx</module>
   </modules>
   
