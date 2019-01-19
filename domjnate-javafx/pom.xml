@@ -18,6 +18,17 @@
     	<version>1.0.2</version>
 	</dependency>
 	<dependency>
+	  <groupId>com.user00.domjnate</groupId>
+	  <artifactId>domjnate-api</artifactId>
+	  <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
     	<groupId>org.openjfx</groupId>
     	<artifactId>javafx-web</artifactId>
     	<version>11.0.1</version>
