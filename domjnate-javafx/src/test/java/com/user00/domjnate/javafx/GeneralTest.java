@@ -11,11 +11,10 @@ import com.user00.domjnate.api.URL;
 import com.user00.domjnate.api.Uint8Array;
 import com.user00.domjnate.api.Window;
 import com.user00.domjnate.api.XMLHttpRequest;
-import com.user00.domjnate.api.html.HTMLBodyElement;
+import com.user00.domjnate.api.dom.Element;
 import com.user00.domjnate.api.html.HTMLElement;
 import com.user00.domjnate.api.intl.NumberFormat;
 import com.user00.domjnate.util.Js;
-import com.user00.domjnate.util.JsThunkAccess;
 
 import javafx.scene.web.WebEngine;
 import netscape.javascript.JSObject;
@@ -181,6 +180,19 @@ public class GeneralTest
          body.setInnerHTML("<div>hello</div>");
          HTMLElement el = Js.cast(body.querySelector("div"), HTMLElement.class);
          Assert.assertEquals("hello", el.getTextContent());
+      });
+   }
+   
+   @Test
+   public void testNodeList()
+   {
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         HTMLElement body = win.getDocument().getBody();
+         body.setInnerHTML("<div>hello</div><div>hello2</div>");
+         Element el = body.querySelectorAll("div").get(1, Element.class);
+         Assert.assertEquals("hello2", el.getTextContent());
       });
    }
    
