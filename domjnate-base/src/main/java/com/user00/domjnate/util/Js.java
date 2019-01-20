@@ -44,6 +44,7 @@ public class Js
       throw new IllegalArgumentException("Cannot find JavaScript context to access JS object");
    }
 
+   @Deprecated
    public static <T> T _new(Object scope, String className, Class<T> type)
    {
       if (scope instanceof JsThunkAccess)

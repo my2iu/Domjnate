@@ -9,8 +9,8 @@ public class Js
 
    
    public static native <T> T construct(Object scope, Object constructor, Class<T> type, Object...args) /*-{
-      // TODO: This is wrong
-      return constructor.call(scope, args); 
+      var ctor = Function.bind.apply(constructor, [constructor].concat(args));
+      return new ctor();
     }-*/;
    
    public static native <T> T callStaticMethod(Object scope, String className, String methodName, Class<T> type, Object...args)/*-{
