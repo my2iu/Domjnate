@@ -1,13 +1,7 @@
 package com.user00.domjnate.javafx;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.swing.JFrame;
-
-import com.google.gwt.core.shared.GwtIncompatible;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -16,12 +10,10 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 
-@GwtIncompatible
 public class Fx {
 
   /**
