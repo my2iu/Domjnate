@@ -71,7 +71,10 @@ public class DomjnateFx
          {
             String name = call.name();
             if (name == null) name = method.getName();
-            return wrapJsReturnType(obj.call(name, unwrapArguments(args, thunk)), method.getReturnType(), thunk);
+            Class<?> expectedReturnType = method.getReturnType();
+            Object toReturn = obj.call(name, unwrapArguments(args, thunk)); 
+            if (expectedReturnType == Void.TYPE) return null; 
+            return wrapJsReturnType(toReturn, expectedReturnType, thunk);
          }
          if (method.isDefault())
          {
@@ -127,6 +130,10 @@ public class DomjnateFx
                   "(function(fnObj) {" +
                   "  return function(...args) { return fnObj.passthroughCall(args); };" +
                   "})")).call("call", thunk.scope, new ArgumentPasser.FunctionPassthroughToJava((args) -> {
+                     for (int n = 0; n < args.length; n++)
+                     {
+                        args[n] = wrapJsReturnType(args[n], val.getClass().getInterfaces()[0].getMethods()[0].getParameterTypes()[n], thunk);
+                     }
                      try {
                         return val.getClass().getInterfaces()[0].getMethods()[0].invoke(val, args);
                      } 

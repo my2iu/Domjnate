@@ -11,6 +11,7 @@ import javafx.concurrent.Worker.State;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 
@@ -47,6 +48,12 @@ public class Fx {
           @Override
           public void handle(WebEvent<String> msg) {
             System.err.println(msg.getData());
+          }});
+        engine.setOnError(new EventHandler<WebErrorEvent>() {
+          @Override
+          public void handle(WebErrorEvent err)
+          {
+            err.getException().printStackTrace(System.err);
           }});
         engine.getLoadWorker().stateProperty().addListener(
             new ChangeListener<Worker.State>() {

@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.user00.domjnate.api.CSSRule;
 import com.user00.domjnate.api.FrameRequestCallback;
 import com.user00.domjnate.api.MouseEvent;
+import com.user00.domjnate.api.MouseEventInit;
 import com.user00.domjnate.api.TextDecoder;
 import com.user00.domjnate.api.TextEncoder;
 import com.user00.domjnate.api.URL;
@@ -19,6 +20,8 @@ import com.user00.domjnate.api.Uint8Array;
 import com.user00.domjnate.api.Window;
 import com.user00.domjnate.api.XMLHttpRequest;
 import com.user00.domjnate.api.dom.Element;
+import com.user00.domjnate.api.dom.Event;
+import com.user00.domjnate.api.html.HTMLDivElement;
 import com.user00.domjnate.api.html.HTMLElement;
 import com.user00.domjnate.api.intl.NumberFormat;
 import com.user00.domjnate.util.Js;
@@ -205,6 +208,8 @@ public class GeneralTest
    
    // TODO: Test Date.toLocaleString() (pass wrapped object into method)
    
+   static final int WAIT_TIME = 5;
+   
    @Test
    public void testCallback() throws InterruptedException, ExecutionException, TimeoutException
    {
@@ -217,6 +222,30 @@ public class GeneralTest
          });
       });
       
-      Assert.assertTrue(triggered.get(5, TimeUnit.SECONDS).booleanValue());
+      Assert.assertTrue(triggered.get(WAIT_TIME, TimeUnit.SECONDS).booleanValue());
+   }
+   
+   /** Tests an event callback called from JavaScript, which is passed JS objects */
+   @Test
+   public void testEventCallback() throws InterruptedException, ExecutionException, TimeoutException
+   {
+      CompletableFuture<Double> triggered = new CompletableFuture<>();
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         win.getDocument().getBody().setInnerHTML("<div>text</div>");
+         HTMLDivElement div = Js.cast(win.getDocument().querySelector("div"), HTMLDivElement.class);
+         div.addEventListener("click", (evt) -> {
+            div.setTextContent("hi");
+            triggered.complete(Js.cast(evt, MouseEvent.class).getButton());
+         });
+         
+         MouseEventInit meInit = Js.cast(com.user00.domjnate.api.Object._new(win), MouseEventInit.class);
+         meInit.setButton(42.0);
+         MouseEvent me = MouseEvent._new(win, "click", meInit);
+         div.dispatchEvent(me);
+      });
+      
+      Assert.assertEquals(42.0, triggered.get(WAIT_TIME, TimeUnit.SECONDS), 0.001);
    }
 }
