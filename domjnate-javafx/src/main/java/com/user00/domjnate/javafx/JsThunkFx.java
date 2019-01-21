@@ -25,7 +25,7 @@ public class JsThunkFx implements JsThunk
       JSObject constructorFn = (JSObject)jsObj.eval("(function (...args) { return new this(...args); })");
       Object [] argsWithThis = new Object[args.length + 1];
       for (int n = 0; n < args.length; n++)
-         argsWithThis[n + 1] = DomjnateFx.unwrapObject(args[n]);
+         argsWithThis[n + 1] = DomjnateFx.unwrapObject(args[n], this);
       // Will use jsObj as "this", but it doesn't matter since we're just calling a function
       argsWithThis[0] = jsObj;
       return (T)DomjnateFx.createJsBridgeProxy(type, (JSObject)constructorFn.call("call", argsWithThis), this);
@@ -50,7 +50,7 @@ public class JsThunkFx implements JsThunk
    public <T> void setMember(Object scope, String member, T val)
    {
       JSObject jsObj = ((DomjnateJSObjectAccess)scope).__DomjnateGetJSObjectFromProxy();
-      jsObj.setMember(member, DomjnateFx.unwrapObject(val));
+      jsObj.setMember(member, DomjnateFx.unwrapObject(val, this));
    }
    
    @Override
@@ -64,7 +64,7 @@ public class JsThunkFx implements JsThunk
    public <T> void setIndex(Object obj, int idx, T val)
    {
       JSObject jsObj = ((DomjnateJSObjectAccess)obj).__DomjnateGetJSObjectFromProxy();
-      jsObj.setSlot(idx, DomjnateFx.unwrapObject(val));
+      jsObj.setSlot(idx, DomjnateFx.unwrapObject(val, this));
    }
    
    @Override

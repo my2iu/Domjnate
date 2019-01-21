@@ -1,9 +1,16 @@
 package com.user00.domjnate.javafx;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.user00.domjnate.api.CSSRule;
+import com.user00.domjnate.api.FrameRequestCallback;
 import com.user00.domjnate.api.MouseEvent;
 import com.user00.domjnate.api.TextDecoder;
 import com.user00.domjnate.api.TextEncoder;
@@ -197,4 +204,19 @@ public class GeneralTest
    }
    
    // TODO: Test Date.toLocaleString() (pass wrapped object into method)
+   
+   @Test
+   public void testCallback() throws InterruptedException, ExecutionException, TimeoutException
+   {
+      CompletableFuture<Boolean> triggered = new CompletableFuture<>();
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         win.requestAnimationFrame((time) -> {
+            triggered.complete(true);
+         });
+      });
+      
+      Assert.assertTrue(triggered.get(5, TimeUnit.SECONDS).booleanValue());
+   }
 }

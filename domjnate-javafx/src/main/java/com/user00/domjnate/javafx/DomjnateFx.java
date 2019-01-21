@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import com.user00.domjnate.util.JsThunk;
 import com.user00.domjnate.util.JsThunkAccess;
 
+import jsinterop.annotations.JsFunction;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
@@ -35,9 +37,9 @@ public class DomjnateFx
    static class JsObjectWrapperInvocationHandler implements InvocationHandler
    {
       JSObject obj;
-      JsThunk thunk;
+      JsThunkFx thunk;
       MethodHandles.Lookup methodHandlesLookup;
-      JsObjectWrapperInvocationHandler(JSObject obj, JsThunk thunk)
+      JsObjectWrapperInvocationHandler(JSObject obj, JsThunkFx thunk)
       {
          this.obj = obj;
          this.thunk = thunk;
@@ -69,7 +71,7 @@ public class DomjnateFx
          {
             String name = call.name();
             if (name == null) name = method.getName();
-            return wrapJsReturnType(obj.call(name, unwrapArguments(args)), method.getReturnType(), thunk);
+            return wrapJsReturnType(obj.call(name, unwrapArguments(args, thunk)), method.getReturnType(), thunk);
          }
          if (method.isDefault())
          {
@@ -81,7 +83,7 @@ public class DomjnateFx
                               method.getName(), 
                               MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
                               method.getDeclaringClass());
-            return mh.bindTo(proxy).invokeWithArguments(unwrapArguments(args));
+            return mh.bindTo(proxy).invokeWithArguments(unwrapArguments(args, thunk));
          }
          if (GET_JS_OBJECT_FROM_PROXY.equals(method))
          {
@@ -96,7 +98,7 @@ public class DomjnateFx
       
    }
    
-   public static <T> T createJsBridgeProxy(Class<T> wrapper, JSObject obj, JsThunk thunk)
+   public static <T> T createJsBridgeProxy(Class<T> wrapper, JSObject obj, JsThunkFx thunk)
    {
       return (T)Proxy.newProxyInstance(wrapper.getClassLoader(), new Class[] {wrapper, DomjnateJSObjectAccess.class, JsThunkAccess.class},
             new JsObjectWrapperInvocationHandler(obj, thunk));
@@ -111,22 +113,42 @@ public class DomjnateFx
       return o;
    }
 
-   static Object unwrapObject(Object val)
+   static Object unwrapObject(Object val, JsThunkFx thunk)
    {
       if (val instanceof DomjnateJSObjectAccess)
          return ((DomjnateJSObjectAccess)val).__DomjnateGetJSObjectFromProxy();
+      else
+      {
+         Class<?> objClass = val.getClass();
+         if (objClass.getInterfaces().length > 0 &&
+                     objClass.getInterfaces()[0].isAnnotationPresent(JsFunction.class))
+         {
+            return ((JSObject)thunk.scope.eval(
+                  "(function(fnObj) {" +
+                  "  return function(...args) { return fnObj.passthroughCall(args); };" +
+                  "})")).call("call", thunk.scope, new ArgumentPasser.FunctionPassthroughToJava((args) -> {
+                     try {
+                        return val.getClass().getInterfaces()[0].getMethods()[0].invoke(val, args);
+                     } 
+                     catch (IllegalAccessException | InvocationTargetException | SecurityException e)
+                     {
+                        throw new IllegalArgumentException(e);
+                     }
+                  }));
+         }
       return val;
+      }
    }
    
-   static Object [] unwrapArguments(Object[] args)
+   static Object [] unwrapArguments(Object[] args, JsThunkFx thunk)
    {
       Object[] toReturn = new Object[args.length];
       for (int n = 0; n < args.length; n++)
-         toReturn[n] = unwrapObject(args[n]);
+         toReturn[n] = unwrapObject(args[n], thunk);
       return toReturn;
    }
 
-   static <T> T wrapJsReturnType(Object obj, Class<T> desiredType, JsThunk thunk)
+   static <T> T wrapJsReturnType(Object obj, Class<T> desiredType, JsThunkFx thunk)
    {
       if (obj == null) return null;
       if (desiredType == String.class)
