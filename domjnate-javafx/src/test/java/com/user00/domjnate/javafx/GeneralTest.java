@@ -61,7 +61,7 @@ public class GeneralTest
       Fx.runBlankWebPageInFx((WebEngine engine) -> {
          JSObject jsWin = (JSObject)engine.executeScript("window");
          Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
-         Assert.assertEquals(6, CSSRule.getPAGE_RULE(win), 0);
+         Assert.assertEquals(6, CSSRule.PAGE_RULE(win), 0);
          
          // TODO: test static setting of properties
       });
@@ -97,7 +97,7 @@ public class GeneralTest
       Fx.runBlankWebPageInFx((WebEngine engine) -> {
          JSObject jsWin = (JSObject)engine.executeScript("window");
          Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
-         Assert.assertEquals(Math.E, com.user00.domjnate.api.Math.getE(win), 0.00001);
+         Assert.assertEquals(Math.E, com.user00.domjnate.api.Math.E(win), 0.00001);
       });
    }
    
