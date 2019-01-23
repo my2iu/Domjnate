@@ -1,5 +1,7 @@
 package com.user00.domjnate.javafx;
 
+import java.lang.reflect.Type;
+
 import com.user00.domjnate.util.JsThunk;
 
 import netscape.javascript.JSObject;
@@ -15,7 +17,7 @@ public class JsThunkFx implements JsThunk
    }
 
    @Override
-   public <T> T construct(Object constructor, Class<T> type, Object...args)
+   public <T> T construct(Object constructor, Type type, Object...args)
    {
       if (constructor instanceof String && "undefined".equals(constructor))
       {
@@ -28,11 +30,14 @@ public class JsThunkFx implements JsThunk
          argsWithThis[n + 1] = DomjnateFx.unwrapObject(args[n], this);
       // Will use jsObj as "this", but it doesn't matter since we're just calling a function
       argsWithThis[0] = jsObj;
-      return (T)DomjnateFx.createJsBridgeProxy(type, (JSObject)constructorFn.call("call", argsWithThis), this);
+      if (type instanceof Class)
+         return (T)DomjnateFx.createJsBridgeProxy((Class<T>)type, (JSObject)constructorFn.call("call", argsWithThis), this);
+      else
+         throw new IllegalArgumentException("Expecting Class");
    }
 
    @Override
-   public <T> T callMethod(Object obj, String methodName, Class<T> type,
+   public <T> T callMethod(Object obj, String methodName, Type type,
          Object... args)
    {
       JSObject jsObj = ((DomjnateJSObjectAccess)obj).__DomjnateGetJSObjectFromProxy();
@@ -40,7 +45,7 @@ public class JsThunkFx implements JsThunk
    }
 
    @Override
-   public <T> T getMember(Object scope, String member, Class<T> type)
+   public <T> T getMember(Object scope, String member, Type type)
    {
       JSObject jsObj = ((DomjnateJSObjectAccess)scope).__DomjnateGetJSObjectFromProxy();
       return (T)DomjnateFx.wrapJsReturnType(jsObj.getMember(member), type, this);
@@ -54,7 +59,7 @@ public class JsThunkFx implements JsThunk
    }
    
    @Override
-   public <T> T getIndex(Object obj, int idx, Class<T> type)
+   public <T> T getIndex(Object obj, int idx, Type type)
    {
       JSObject jsObj = ((DomjnateJSObjectAccess)obj).__DomjnateGetJSObjectFromProxy();
       return (T)DomjnateFx.wrapJsReturnType(jsObj.getSlot(idx), type, this);
@@ -68,9 +73,12 @@ public class JsThunkFx implements JsThunk
    }
    
    @Override
-   public <T> T cast(Object obj, Class<T> type)
+   public <T> T cast(Object obj, Type type)
    {
       JSObject jsObj = ((DomjnateJSObjectAccess)obj).__DomjnateGetJSObjectFromProxy();
-      return DomjnateFx.createJsBridgeProxy(type, jsObj, this);
+      if (type instanceof Class)
+         return DomjnateFx.createJsBridgeProxy((Class<T>)type, jsObj, this);
+      else
+         throw new IllegalArgumentException("Expecting Class");
    }
 }

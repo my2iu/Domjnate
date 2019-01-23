@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 import com.user00.domjnate.util.JsThunk;
@@ -155,7 +156,7 @@ public class DomjnateFx
       return toReturn;
    }
 
-   static <T> T wrapJsReturnType(Object obj, Class<T> desiredType, JsThunkFx thunk)
+   static <T> T wrapJsReturnType(Object obj, Type desiredType, JsThunkFx thunk)
    {
       if (obj == null) return null;
       if (desiredType == String.class)
@@ -169,11 +170,16 @@ public class DomjnateFx
       else if (desiredType == Boolean.TYPE || desiredType == Boolean.class)
          return (T)obj;
       // Check if it's a JSType
-      Annotation jsType = desiredType.getAnnotation(JsType.class);
-      if (jsType != null && obj instanceof JSObject)
+      if (desiredType instanceof Class)
       {
-         return createJsBridgeProxy(desiredType, (JSObject)obj, thunk); 
+         Annotation jsType = ((Class<?>)desiredType).getAnnotation(JsType.class);
+         if (jsType != null && obj instanceof JSObject)
+         {
+            return createJsBridgeProxy((Class<T>)desiredType, (JSObject)obj, thunk); 
+         }
       }
+      else
+         throw new IllegalArgumentException("Expecting Class");
       if (obj instanceof String && "undefined".equals(obj))
       {
          throw new IllegalArgumentException("Could not wrap object--received \"undefined\", and it's ambiguous whether it should be a string or null");

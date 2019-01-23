@@ -1,5 +1,7 @@
 package com.user00.domjnate.util;
 
+import java.lang.reflect.Type;
+
 public class Js
 {
    // TODO: This only works for globally accessible classes for now
@@ -13,7 +15,7 @@ public class Js
       throw new IllegalArgumentException("Cannot find JavaScript context to access JS object");
    }
 
-   public static <T> T construct(Object scope, Object constructor, Class<T> type, Object...args)
+   public static <T> T construct(Object scope, Object constructor, Type type, Object...args)
    {
       if (scope instanceof JsThunkAccess)
       {
@@ -23,7 +25,7 @@ public class Js
       throw new IllegalArgumentException("Cannot find JavaScript context to access JS object");
    }
    
-   public static <T> T callStaticMethod(Object scope, String className, String methodName, Class<T> type, Object...args)
+   public static <T> T callStaticMethod(Object scope, String className, String methodName, Type type, Object...args)
    {
       if (scope instanceof JsThunkAccess)
       {
@@ -34,7 +36,7 @@ public class Js
       throw new IllegalArgumentException("Cannot find JavaScript context to access JS object");
    }
 
-   public static <T> T callMethod(Object parent, String memberName, Class<T> type, Object...args)
+   public static <T> T callMethod(Object parent, String memberName, Type type, Object...args)
    {
       if (parent instanceof JsThunkAccess)
       {
@@ -57,7 +59,7 @@ public class Js
    }
 
    // TODO: Should it be an int for idx?
-   public static <T> T getIndex(Object obj, double idx, Class<T> type)
+   public static <T> T getIndex(Object obj, double idx, Type type)
    {
       if (obj instanceof JsThunkAccess)
       {
@@ -78,7 +80,7 @@ public class Js
       throw new IllegalArgumentException("Cannot find JavaScript context to access JS object");
    }
 
-   public static <T> T getMember(Object scope, String member, Class<T> type)
+   public static <T> T getMember(Object scope, String member, Type type)
    {
       if (scope instanceof JsThunkAccess)
       {
