@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.user00.domjnate.api.CSSRule;
 import com.user00.domjnate.api.FrameRequestCallback;
+import com.user00.domjnate.api.JSON;
 import com.user00.domjnate.api.MouseEvent;
 import com.user00.domjnate.api.MouseEventInit;
 import com.user00.domjnate.api.TextDecoder;
@@ -18,12 +19,14 @@ import com.user00.domjnate.api.TextEncoder;
 import com.user00.domjnate.api.URL;
 import com.user00.domjnate.api.Uint8Array;
 import com.user00.domjnate.api.Window;
+import com.user00.domjnate.api.WindowOrWorkerGlobalScope;
 import com.user00.domjnate.api.XMLHttpRequest;
 import com.user00.domjnate.api.dom.Element;
 import com.user00.domjnate.api.dom.Event;
 import com.user00.domjnate.api.html.HTMLDivElement;
 import com.user00.domjnate.api.html.HTMLElement;
 import com.user00.domjnate.api.intl.NumberFormat;
+import com.user00.domjnate.util.EmptyInterface;
 import com.user00.domjnate.util.Js;
 
 import javafx.scene.web.WebEngine;
@@ -207,6 +210,19 @@ public class GeneralTest
    }
    
    // TODO: Test Date.toLocaleString() (pass wrapped object into method)
+   
+   @Test
+   public void testReturnLangObject() throws NoSuchMethodException
+   {
+      // Tests returning a generic java.lang.Object from JavaScript that has no type
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         Assert.assertEquals(java.lang.Object.class, JSON.class.getMethod("parse", new Class<?>[] {WindowOrWorkerGlobalScope.class, String.class}).getReturnType());
+         Assert.assertTrue(JSON.parse(win, "[\"hello\"]") instanceof java.lang.Object);
+         Assert.assertTrue(JSON.parse(win, "[\"hello\"]") instanceof EmptyInterface);
+      });
+   }
    
    static final int WAIT_TIME = 5;
    

@@ -11,6 +11,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
+import com.user00.domjnate.util.EmptyInterface;
 import com.user00.domjnate.util.JsThunk;
 import com.user00.domjnate.util.JsThunkAccess;
 
@@ -73,7 +74,11 @@ public class DomjnateFx
             String name = call.name();
             if (name == null) name = method.getName();
             Class<?> expectedReturnType = method.getReturnType();
-            Object toReturn = obj.call(name, unwrapArguments(args, thunk)); 
+            Object toReturn;
+            if (args == null)
+               toReturn = obj.call(name);
+            else
+               toReturn = obj.call(name, unwrapArguments(args, thunk)); 
             if (expectedReturnType == Void.TYPE) return null; 
             return wrapJsReturnType(toReturn, expectedReturnType, thunk);
          }
@@ -173,9 +178,17 @@ public class DomjnateFx
       if (desiredType instanceof Class)
       {
          Annotation jsType = ((Class<?>)desiredType).getAnnotation(JsType.class);
-         if (jsType != null && obj instanceof JSObject)
+         if (obj instanceof JSObject)
          {
-            return createJsBridgeProxy((Class<T>)desiredType, (JSObject)obj, thunk); 
+            if (jsType != null)
+            {
+               return createJsBridgeProxy((Class<T>)desiredType, (JSObject)obj, thunk); 
+            }
+            else if (desiredType.equals(Object.class))
+            {
+               return (T)createJsBridgeProxy(EmptyInterface.class, (JSObject)obj, thunk); 
+            }
+            
          }
       }
       else
