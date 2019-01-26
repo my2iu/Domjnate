@@ -2,6 +2,8 @@ package com.user00.domjnate.util;
 
 import java.lang.reflect.Type;
 
+import com.user00.domjnate.api.Function;
+
 public interface JsThunk
 {
    Object getConstructor(String className);
@@ -12,4 +14,5 @@ public interface JsThunk
    <T> T getIndex(Object obj, int idx, Type type);
    <T> void setIndex(Object obj, int idx, T val);
    <T> T cast(Object obj, Type type);
+   Function lambdaAsFunction(Object lambda);
 }

@@ -2,6 +2,8 @@ package com.user00.domjnate.util;
 
 import java.lang.reflect.Type;
 
+import com.user00.domjnate.api.Function;
+
 public class Js
 {
    // TODO: This only works for globally accessible classes for now
@@ -108,6 +110,15 @@ public class Js
          return thunk.cast(obj, type);
       }
       return (T)obj;
-      
+   }
+   
+   public static Function lambdaAsFunction(Object scope, Object lambda)
+   {
+      if (scope instanceof JsThunkAccess)
+      {
+         JsThunk thunk = ((JsThunkAccess)scope).__DomjnateGetJsThunk();
+         return thunk.lambdaAsFunction(lambda);
+      }      
+      throw new IllegalArgumentException("Cannot find JavaScript context to use to create a Function");
    }
 }

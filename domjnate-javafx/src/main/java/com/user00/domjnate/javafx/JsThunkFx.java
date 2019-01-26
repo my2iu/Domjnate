@@ -2,8 +2,10 @@ package com.user00.domjnate.javafx;
 
 import java.lang.reflect.Type;
 
+import com.user00.domjnate.api.Function;
 import com.user00.domjnate.util.JsThunk;
 
+import jsinterop.annotations.JsFunction;
 import netscape.javascript.JSObject;
 
 public class JsThunkFx implements JsThunk
@@ -80,5 +82,18 @@ public class JsThunkFx implements JsThunk
          return DomjnateFx.createJsBridgeProxy((Class<T>)type, jsObj, this);
       else
          throw new IllegalArgumentException("Expecting Class");
+   }
+   
+   @Override
+   public Function lambdaAsFunction(Object lambda)
+   {
+      Class<?> objClass = lambda.getClass();
+      if (objClass.getInterfaces().length > 0 &&
+                  objClass.getInterfaces()[0].isAnnotationPresent(JsFunction.class))
+      {
+         return DomjnateFx.wrapJsReturnType(DomjnateFx.wrapLambdaWithJsFunction(lambda, this), Function.class, this);
+      }
+      throw new IllegalArgumentException("Expecting a lambda with a @JsFunction annotation");
+
    }
 }
