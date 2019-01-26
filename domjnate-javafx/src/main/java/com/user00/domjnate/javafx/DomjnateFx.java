@@ -9,10 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import com.user00.domjnate.util.EmptyInterface;
-import com.user00.domjnate.util.JsThunk;
 import com.user00.domjnate.util.JsThunkAccess;
 
 import jsinterop.annotations.JsFunction;
@@ -122,6 +122,22 @@ public class DomjnateFx
       return o;
    }
 
+   /**
+    * This map is needed for 2 reasons:
+    *   1. In order to make sure that a Java lambda is always converted to the
+    *      same JS function in JS (so that it can be reliably added and removed
+    *      as event handlers), we need to remember which JS function we previously
+    *      converted a lambda to.
+    *   2. The JavaFx 11.0.1 webview seems to be garbage collecting the Java lambdas 
+    *      even though they are being used as event handlers in JS. The workaround
+    *      is to let the programmer manually keep the lambdas around until they aren't
+    *      needed any more. Unfortunately, because the JS functions actually call through
+    *      to an intermediate argument passer Java object instead of directly to the
+    *      Java lambda, we need to use a weak hashmap to keep the argument passer 
+    *      object alive for as long as the Java lambda is kept alive.
+    */
+   static Map<Object, ArgumentPasser.FunctionPassthroughToJava> lambdasToPassthroughFunction = new WeakHashMap<>();
+   
    static Object unwrapObject(Object val, JsThunkFx thunk)
    {
       if (val instanceof DomjnateJSObjectAccess)
@@ -132,22 +148,46 @@ public class DomjnateFx
          if (objClass.getInterfaces().length > 0 &&
                      objClass.getInterfaces()[0].isAnnotationPresent(JsFunction.class))
          {
-            return ((JSObject)thunk.scope.eval(
+            ArgumentPasser.FunctionPassthroughToJava argumentPasser = lambdasToPassthroughFunction.get(val);
+            if (argumentPasser != null) return argumentPasser.jsFunction;
+            
+            // JavaFX 11.0.1 webview seems to have problems calling from JS to Java due to 
+            // problems with reflection and permissions. To get around this, I need
+            // to use a very public passthrough class that the JavaFX can reliably 
+            // can reflection info from and call.
+            argumentPasser = new ArgumentPasser.FunctionPassthroughToJava((args) -> {
+               for (int n = 0; n < args.length; n++)
+               {
+                  args[n] = wrapJsReturnType(args[n], val.getClass().getInterfaces()[0].getMethods()[0].getParameterTypes()[n], thunk);
+               }
+               try {
+                  return val.getClass().getInterfaces()[0].getMethods()[0].invoke(val, args);
+               } 
+               catch (IllegalAccessException | InvocationTargetException | SecurityException e)
+               {
+                  throw new IllegalArgumentException(e);
+               }
+            });
+
+            // We need to create a proper JavaScript function that will then pass its
+            // arguments into Java. Then in Java, we can pass those arguments through to
+            // the actual Java lambda function.
+            JSObject jsFunctionPassthrough = (JSObject)((JSObject)thunk.scope.eval(
                   "(function(fnObj) {" +
                   "  return function(...args) { return fnObj.passthroughCall(args); };" +
-                  "})")).call("call", thunk.scope, new ArgumentPasser.FunctionPassthroughToJava((args) -> {
-                     for (int n = 0; n < args.length; n++)
-                     {
-                        args[n] = wrapJsReturnType(args[n], val.getClass().getInterfaces()[0].getMethods()[0].getParameterTypes()[n], thunk);
-                     }
-                     try {
-                        return val.getClass().getInterfaces()[0].getMethods()[0].invoke(val, args);
-                     } 
-                     catch (IllegalAccessException | InvocationTargetException | SecurityException e)
-                     {
-                        throw new IllegalArgumentException(e);
-                     }
-                  }));
+                  "})")).call("call", thunk.scope, argumentPasser);
+            
+            // We will then store this JS function, so that we can reliably reuse the same function
+            // as a stand-in for the lambda in JS if we ever need to convert the lambda again
+            argumentPasser.jsFunction = jsFunctionPassthrough;
+            
+            // In order to make sure that lambdas always get converted to the same  
+            // JS function if they are passed through multiple times, we need to 
+            // save what the previous JS function it was wrapped with before. This is
+            // also needed for garbage collection reasons (see the documentation for
+            // the Map to see why)
+            lambdasToPassthroughFunction.put(val, argumentPasser);
+            return jsFunctionPassthrough;
          }
       return val;
       }

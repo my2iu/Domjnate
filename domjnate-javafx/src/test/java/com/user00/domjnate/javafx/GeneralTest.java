@@ -5,11 +5,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.user00.domjnate.api.CSSRule;
+import com.user00.domjnate.api.EventListener;
 import com.user00.domjnate.api.FrameRequestCallback;
 import com.user00.domjnate.api.JSON;
 import com.user00.domjnate.api.MouseEvent;
@@ -263,5 +265,53 @@ public class GeneralTest
       });
       
       Assert.assertEquals(42.0, triggered.get(WAIT_TIME, TimeUnit.SECONDS), 0.001);
+   }
+   
+   @Test
+   public void testAddRemoveEventHandler() throws Exception
+   {
+      AtomicInteger nextTrigger = new AtomicInteger(0);
+      CompletableFuture<Boolean> [] triggered = new CompletableFuture [] {
+         new CompletableFuture<Boolean>(), new CompletableFuture<Boolean>(), new CompletableFuture<Boolean>()
+      };
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         win.getDocument().getBody().setInnerHTML("<div>text</div>");
+         HTMLDivElement div = Js.cast(win.getDocument().querySelector("div"), HTMLDivElement.class);
+         EventListener listener1 = (evt) -> {
+            triggered[nextTrigger.get()].complete(true);
+            nextTrigger.incrementAndGet();
+            // Prevent the other event handler from firing
+            evt.stopImmediatePropagation();
+         };
+         EventListener listener2 = (evt) -> {
+            div.setTextContent("hi2");
+            triggered[nextTrigger.get()].complete(true);
+            nextTrigger.incrementAndGet();
+         };
+         div.addEventListener("click", listener1);
+         div.addEventListener("click", listener2);
+         
+         // Send an event in, and only the first listener should fire
+         MouseEvent me = MouseEvent._new(win, "click");
+         div.dispatchEvent(me);
+         triggered[0].get(WAIT_TIME, TimeUnit.SECONDS);
+         Assert.assertEquals("text", div.getTextContent());
+         
+         // Try removing one of the event listeners
+         div.removeEventListener("click", listener1);
+         
+         // Send an event in, and only the second event handler should fire
+         Assert.assertEquals(1, nextTrigger.get());
+         div.dispatchEvent(me);
+         triggered[1].get(WAIT_TIME, TimeUnit.SECONDS);
+         Assert.assertEquals(2, nextTrigger.get());
+         Assert.assertEquals("hi2", div.getTextContent());
+         triggered[2].complete(true);
+      });
+      
+      Assert.assertTrue(triggered[2].get(WAIT_TIME, TimeUnit.SECONDS));
+      Assert.assertEquals(2, nextTrigger.get());
    }
 }
