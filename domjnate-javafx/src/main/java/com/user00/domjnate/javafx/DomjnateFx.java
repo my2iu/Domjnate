@@ -225,6 +225,7 @@ public class DomjnateFx
       int idx = 0;
       for (int n = 0; n < args.length; n++)
       {
+         // Flatten rest parameters
          if (n == varArgParameter)
          {
             if (args[n] == null) continue;

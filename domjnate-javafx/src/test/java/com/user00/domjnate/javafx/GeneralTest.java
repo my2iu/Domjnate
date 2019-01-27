@@ -14,6 +14,7 @@ import com.user00.domjnate.api.Array;
 import com.user00.domjnate.api.CSSRule;
 import com.user00.domjnate.api.EventListener;
 import com.user00.domjnate.api.FrameRequestCallback;
+import com.user00.domjnate.api.Function;
 import com.user00.domjnate.api.JSON;
 import com.user00.domjnate.api.MouseEvent;
 import com.user00.domjnate.api.MouseEventInit;
@@ -328,7 +329,7 @@ public class GeneralTest
          VoidFunction func = () -> {
            triggered.complete(true); 
          };
-         win.setTimeout(Js.lambdaAsFunction(win, func), 12.0, (Object[])null);
+         win.setTimeout((Function)Js.lambdaAsFunction(win, func), 12.0, (Object[])null);
       });   
       Assert.assertTrue(triggered.get(WAIT_TIME, TimeUnit.SECONDS).booleanValue());
    }

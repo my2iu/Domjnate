@@ -85,7 +85,7 @@ public class JsThunkFx implements JsThunk
    }
    
    @Override
-   public Function lambdaAsFunction(Object lambda)
+   public <T> T lambdaAsFunction(Object lambda)
    {
       Class<?> objClass = lambda.getClass();
       if (objClass.getInterfaces().length > 0 &&

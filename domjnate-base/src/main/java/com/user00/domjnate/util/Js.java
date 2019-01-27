@@ -2,8 +2,6 @@ package com.user00.domjnate.util;
 
 import java.lang.reflect.Type;
 
-import com.user00.domjnate.api.Function;
-
 public class Js
 {
    // TODO: This only works for globally accessible classes for now
@@ -112,7 +110,7 @@ public class Js
       return (T)obj;
    }
    
-   public static Function lambdaAsFunction(Object scope, Object lambda)
+   public static <T> T lambdaAsFunction(Object scope, Object lambda)
    {
       if (scope instanceof JsThunkAccess)
       {

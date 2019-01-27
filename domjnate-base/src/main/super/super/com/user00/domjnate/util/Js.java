@@ -49,4 +49,8 @@ public class Js
    public static native <T> T cast(Object obj, Type type) /*-{
       return obj;
     }-*/;
+   
+   public static native <T> T lambdaAsFunction(Object scope, Object lambda) /*-{
+      return lambda;
+    }-*/;
 }
