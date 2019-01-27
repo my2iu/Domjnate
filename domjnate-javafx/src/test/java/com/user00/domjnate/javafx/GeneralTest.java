@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.user00.domjnate.api.Array;
 import com.user00.domjnate.api.CSSRule;
 import com.user00.domjnate.api.EventListener;
 import com.user00.domjnate.api.FrameRequestCallback;
@@ -20,6 +21,7 @@ import com.user00.domjnate.api.TextDecoder;
 import com.user00.domjnate.api.TextEncoder;
 import com.user00.domjnate.api.URL;
 import com.user00.domjnate.api.Uint8Array;
+import com.user00.domjnate.api.VoidFunction;
 import com.user00.domjnate.api.Window;
 import com.user00.domjnate.api.WindowOrWorkerGlobalScope;
 import com.user00.domjnate.api.XMLHttpRequest;
@@ -313,5 +315,39 @@ public class GeneralTest
       
       Assert.assertTrue(triggered[2].get(WAIT_TIME, TimeUnit.SECONDS));
       Assert.assertEquals(2, nextTrigger.get());
+   }
+   
+   @Test
+   public void testAsFunction() throws InterruptedException, ExecutionException, TimeoutException
+   {
+      CompletableFuture<Boolean> triggered = new CompletableFuture<>();
+      // Some methods take a Function as a parameter instead of a lambda
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         VoidFunction func = () -> {
+           triggered.complete(true); 
+         };
+         win.setTimeout(Js.lambdaAsFunction(win, func), 12.0, (Object[])null);
+      });   
+      Assert.assertTrue(triggered.get(WAIT_TIME, TimeUnit.SECONDS).booleanValue());
+   }
+   
+   @Test
+   public void testPassInRestParameter()
+   {
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         Array<Double> array = Array._new(win);
+         Assert.assertEquals(0, array.getLength(), 0.01);
+         array.push(1.0, 2.0, 3.0);
+         array.push(4.0, 5.0, 6.0);
+         Assert.assertEquals(6, array.getLength(), 0.01);
+         Assert.assertEquals(1, array.get(0, Double.class), 0.01);
+         Assert.assertEquals(3, array.get(2, Double.class), 0.01);
+         Assert.assertEquals(6, array.get(5, Double.class), 0.01);
+      });
+      
    }
 }

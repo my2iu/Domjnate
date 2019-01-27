@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -75,10 +76,11 @@ public class DomjnateFx
             if (name == null) name = method.getName();
             Class<?> expectedReturnType = method.getReturnType();
             Object toReturn;
+            int varArgParameter = method.isVarArgs() ? method.getParameterCount() - 1 : -1;
             if (args == null)
                toReturn = obj.call(name);
             else
-               toReturn = obj.call(name, unwrapArguments(args, thunk)); 
+               toReturn = obj.call(name, unwrapArguments(args, varArgParameter, thunk));
             if (expectedReturnType == Void.TYPE) return null; 
             return wrapJsReturnType(toReturn, expectedReturnType, thunk);
          }
@@ -92,7 +94,8 @@ public class DomjnateFx
                               method.getName(), 
                               MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
                               method.getDeclaringClass());
-            return mh.bindTo(proxy).invokeWithArguments(unwrapArguments(args, thunk));
+            int varArgParameter = method.isVarArgs() ? method.getParameterCount() - 1 : -1;
+            return mh.bindTo(proxy).invokeWithArguments(unwrapArguments(args, varArgParameter, thunk));
          }
          if (GET_JS_OBJECT_FROM_PROXY.equals(method))
          {
@@ -201,11 +204,47 @@ public class DomjnateFx
       return jsFunctionPassthrough;
    }
    
-   static Object [] unwrapArguments(Object[] args, JsThunkFx thunk)
+   static Object [] unwrapArguments(Object[] args, int varArgParameter, JsThunkFx thunk)
    {
-      Object[] toReturn = new Object[args.length];
+      // Count number of arguments including rest parameters
+      int argCount = args.length;
+      if (varArgParameter >= 0 && varArgParameter < args.length)
+      {
+         argCount--;
+         if (args[varArgParameter] != null
+               && args[varArgParameter].getClass().isArray())
+         {
+            int numRestParameters = Array.getLength(args[varArgParameter]);
+            if (numRestParameters > 0)
+               argCount += numRestParameters;
+         }
+      }
+      
+      // Convert parameters for JS
+      Object[] toReturn = new Object[argCount];
+      int idx = 0;
       for (int n = 0; n < args.length; n++)
-         toReturn[n] = unwrapObject(args[n], thunk);
+      {
+         if (n == varArgParameter)
+         {
+            if (args[n] == null) continue;
+            if (args[n].getClass().isArray())
+            {
+               int numRestParameters = Array.getLength(args[varArgParameter]);
+               for (int i = 0; i < numRestParameters; i++)
+               {
+                  toReturn[idx] = unwrapObject(Array.get(args[n], i), thunk);
+                  idx++;
+               }
+            }
+         }
+         else
+         {
+            toReturn[idx] = unwrapObject(args[n], thunk);
+            idx++;
+         }
+         
+      }
       return toReturn;
    }
 
