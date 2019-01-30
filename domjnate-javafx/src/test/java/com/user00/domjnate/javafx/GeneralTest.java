@@ -245,7 +245,32 @@ public class GeneralTest
       
       Assert.assertTrue(triggered.get(WAIT_TIME, TimeUnit.SECONDS).booleanValue());
    }
-   
+
+   /** Tests an onevent callback */
+   @Test
+   public void testOnEventCallback() throws InterruptedException, ExecutionException, TimeoutException
+   {
+      CompletableFuture<Double> triggered = new CompletableFuture<>();
+      Fx.runBlankWebPageInFx((WebEngine engine) -> {
+         JSObject jsWin = (JSObject)engine.executeScript("window");
+         Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+         win.getDocument().getBody().setInnerHTML("<div>text</div>");
+         HTMLDivElement div = Js.cast(win.getDocument().querySelector("div"), HTMLDivElement.class);
+         div.setOnclick( (evt) -> {
+            div.setTextContent("hi");
+            triggered.complete(Js.cast(evt, MouseEvent.class).getButton());
+            return null;
+         });
+         
+         MouseEventInit meInit = Js.cast(com.user00.domjnate.api.Object._new(win), MouseEventInit.class);
+         meInit.setButton(42.0);
+         MouseEvent me = MouseEvent._new(win, "click", meInit);
+         div.dispatchEvent(me);
+      });
+      
+      Assert.assertEquals(42.0, triggered.get(WAIT_TIME, TimeUnit.SECONDS), 0.001);
+   }
+
    /** Tests an event callback called from JavaScript, which is passed JS objects */
    @Test
    public void testEventCallback() throws InterruptedException, ExecutionException, TimeoutException
@@ -349,6 +374,7 @@ public class GeneralTest
          Assert.assertEquals(3, array.get(2, Double.class), 0.01);
          Assert.assertEquals(6, array.get(5, Double.class), 0.01);
       });
-      
    }
+   
+   
 }

@@ -62,10 +62,7 @@ public class DomjnateFx
             if (method.getName().startsWith("set"))
             {
                // Pull out JSObject if it is wrapped
-               if (obj instanceof DomjnateJSObjectAccess)
-                  obj.setMember(prop.name(), ((DomjnateJSObjectAccess)args[0]).__DomjnateGetJSObjectFromProxy());
-               else
-                  obj.setMember(prop.name(), args[0]);
+               obj.setMember(prop.name(), unwrapObject(args[0], thunk));
                return null;
             }
          }
