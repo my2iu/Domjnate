@@ -35,7 +35,7 @@ DOMjnate is primarily intended to be used with the GWT compiler. This lets you w
 
 ## Building
 
-DOMjnate was developed using Java 11 though it can probably also be compiled with Java 10 and possibly Java 9. It has been tested with JavaFX 11 and GWT 2.8.2. It uses `JsInterop` to describe its interfaces, so DOMjnate is likely compatible with j2cl as well. 
+DOMjnate was developed using Java 11 though it can probably also be compiled with Java 10 and possibly Java 9. It has been tested with JavaFX 11 and GWT 2.8.2. It uses `JsInterop` to describe its interfaces, so DOMjnate is likely compatible with [j2cl](https://github.com/google/j2cl) as well. 
 
 Maven `pom.xml` build scripts are supplied for DOMjnate. To build DOMjnate, simply run 
 
@@ -198,7 +198,9 @@ public class ProgramJavaFx extends Application
     launch(args);
   }
 }
+```
 
+```
 public class ProgramGwt implements EntryPoint
 {
   public void onModuleLoad()
@@ -211,7 +213,9 @@ public class ProgramGwt implements EntryPoint
      return $wnd;
    }-*/;
 }
+```
 
+```
 public class ProgramShared
 {
   public static void go(Window win)
@@ -221,13 +225,35 @@ public class ProgramShared
 }
 ```
 
+When loading the initial web page from JavaFX, you have to be sure that it doesn't accidentally run any GWT-compiled JavaScript versions of your code because then you would have two versions of your code running at the same time. So either make sure that your GWT build scripts compile their JavaScript code to a different location than your base .html file, or delete the compiled GWT code each time you run your code from Java.
 
 
-## API
+## Additional API Information
 
+DOMjnate is currently under active development. Although basic functionality should work, some parts have not been tested and maybe unreliable or non-functional. The API may change at any time, and potentially quite drastically.  
 
-/it's evolving/
+Notably, DOMjnate will likely need to change package names in the future, its handling of generics needs to be redesigned, the system for handling callbacks may need to be redesigned, changes may be needed to properly support j2cl, different JS APIs may be spun off into separate packages, better typing of event handlers should be added, and the type information in the API should be augmented with information about integer types.  
+
+Because of the way the DOMjnate API is designed, some aspects of the DOMjnate API don't feel like normal Java code or normal JavaScript code. In particular, DOMjnate uses interfaces to represent all JavaScript objects without providing any concrete implementations of those interfaces. Also, because DOMjnate supports multiple global scopes from either having multiple webview in Java or having multiple iframes in a webpage, many API methods require you to specify a `Window` object referring to the scope you want to use. In a normal web page, there is only one `window` object, so this will feel unusual to JavaScript programmers even though it is a situation that can occur in some more complex web pages.
+
+Here are some additional notes about the DOMjnate API. 
+
+### Constructors
+
+Since all DOMjnate APIs are provided as interfaces, there is no direct way to instantiate them. Instead, a static `_new()` method is supplied that can be called to create a new instance of an object supporting that interface. This `_new()` method requires you to provide a `Window` object where DOMjnate can find the constructor for that type. 
 
 ### Static methods
-### Constructors
-### casting
+
+When calling a DOMjnate static method, you also need to supply a `Window` object so that DOMjnate knows which context to call that static method in.
+
+### Constants
+
+Most JavaScript constants are standardized and well-defined, so they could have been embedded directly in the Java code. To be safe though, DOMjnate instead provides methods for reading out the constant value from JavaScript. Like a static method, programmers must supply a `Window` object so that DOMjnate knows which scope to read the constant from. To reduce verbiage, although constants are considered getters, the word `get` is not added to the front of the method names. 
+
+### Performance
+
+Because of the need to support manipulating a webview from within Java, DOMjnate does impose some slight overhead for certain operations, even when it is compiled to JavaScript using GWT.
+
+Notably, calls to constructors are slow in JavaScript because of the need to create an intermediate function to do the creation. Certain static method calls will also be slower than expected. These slowdowns can potentially be avoided in the future using some simple optimizations in the GWT compiler.
+
+When running the code in Java, there will be overhead involved every time objects are moved between Java and JavaScript. There is also some general sluggishness caused by running a webview under JavaFX. It is also unclear how garbage collection for the JavaFX webview works.
