@@ -35,7 +35,7 @@ DOMjnate is primarily intended to be used with the GWT compiler. This lets you w
 
 ## Building
 
-DOMjnate was developed using Java 11 though it can probably also be compiled with Java 10 and possibly Java 9. It has been tested with JavaFX 11 and GWT 2.8.2. It uses `JsInterop` to describe its interfaces, so DOMjnate is likely compatible with [j2cl](https://github.com/google/j2cl) as well. 
+DOMjnate was developed using Java 11 though it can probably also be compiled with Java 10 and possibly Java 9. It has been tested with JavaFX 11 and GWT 2.8.2. It uses [JsInterop](http://www.gwtproject.org/doc/latest/DevGuideCodingBasicsJsInterop.html) to describe its interfaces, so DOMjnate is likely compatible with [j2cl](https://github.com/google/j2cl) as well. 
 
 Maven `pom.xml` build scripts are supplied for DOMjnate. To build DOMjnate, simply run 
 
@@ -111,18 +111,12 @@ public class Program extends javafx.application.Application
     stage.show();
 
     WebEngine engine = webView.getEngine();
-    engine.getLoadWorker().stateProperty().addListener(
-        new ChangeListener<State>() {
-          public void changed(ObservableValue ov,
-              State oldState, State newState) {
-            if (newState == State.SUCCEEDED) {
-               onload(engine);
-            }
-          }
-        });
+    engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
+      if (newState == State.SUCCEEDED)
+        onload(engine);
+    });
     // Provide an initial .html file to load into the webview
-    engine.load(
-        new File("index.html").toURI().toURL().toExternalForm());
+    engine.load( new File("index.html").toURI().toURL().toExternalForm());
   }
 
   void onload(WebEngine engine)
@@ -177,17 +171,12 @@ public class ProgramJavaFx extends Application
     stage.show();
 
     WebEngine engine = webView.getEngine();
-    engine.getLoadWorker().stateProperty().addListener(
-        new ChangeListener<State>() {
-          public void changed(ObservableValue ov,
-              State oldState, State newState) {
-            if (newState == State.SUCCEEDED) {
-               JSObject jsWin = (JSObject)engine.executeScript("window");
-               Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
-               ProgramShared.go(win);
-            }
-          }
-        });
+    engine.getLoadWorker().stateProperty().addListener( (ov, oldState, newState) -> {
+      if (newState == State.SUCCEEDED) {
+        JSObject jsWin = (JSObject)engine.executeScript("window");
+        Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+        ProgramShared.go(win);
+      }});
     // Load the main GWT html page here
     engine.load(
         new File("index.html").toURI().toURL().toExternalForm());
