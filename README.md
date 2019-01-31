@@ -1,6 +1,15 @@
 # DOM*j*nate
 
-DOMjnate is a Java library that allows you to manipulate the HTML DOM entirely from Java. It takes the standard JavaScript API for working with web pages and provides properly typed interfaces for using that API in a type-safe manner from Java. 
+DOMjnate is a Java library that allows you to manipulate the HTML DOM entirely from Java. It takes the standard JavaScript API for working with web pages and provides properly typed interfaces for using that API in a type-safe manner from Java. For example, the code below creates some text that says "Click me!" The text changes to say "Yay!" when it is clicked.
+
+```
+win.getDocument().getBody().setInnerHTML("<div>Click me!</div>");
+Element div = win.getDocument().querySelector("div");
+div.addEventListener("click", (evt) -> {
+  div.setTextContent("Yay!");
+  evt.preventDefault();
+});
+```
 
 DOMjnate lets your write user interface code in HTML5 entirely in Java. It can be used in two ways:
 
@@ -136,6 +145,7 @@ Most of the DOMjnate APIs require you to have a reference to the JavaScript `win
 JSObject jsWin = (JSObject)engine.executeScript("window");
 Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
 ```
+
 
 
 ## Making programs that run in both GWT and from Java
