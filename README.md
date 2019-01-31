@@ -1,21 +1,149 @@
 # DOM*j*nate
 
-DOMjnate is a Java library that allows you to manipulate HTML DOM JavaScript APIs entirely from Java. The name comes from the DOM of HTML's Document Object Model, a J for Java, and the word "dominate" to represent the goal of using HTML5 for all Java user interface code.
+DOMjnate is a Java library that allows you to manipulate the HTML DOM entirely from Java. It takes the standard JavaScript API for working with web pages and provides properly typed interfaces for using that API in a type-safe manner from Java. 
 
-*brief blurb on what DOMjnate is for*
+DOMjnate lets your write user interface code in HTML5 entirely in Java. It can be used in two ways:
+
+* Your Java code can then be compiled to JavaScript and run in a browser
+* A webview widget can be created from Java, and your Java calls to DOMjnate will manipulate the webview
+
+The name comes from the DOM of HTML's Document Object Model, a J for Java, and the word "dominate" to represent the goal of using HTML5 for all Java user interface code.
+
+
+
 
 ## Comparison to Elemental 2
 
-It is mainly intended as an alternative to [Elemental 2](https://github.com/google/elemental2). DOMjnate has different goals and use-cases than Elemental 2, resulting in a slightly different API. Elemental 2 uses real Java classes to represent JavaScript types and Java fields to represent JavaScript properties. This allows for proper run-time type checking and a Java API that feels more like the native JavaScript. DOMjnate uses only Java interfaces to represent JavaScript types and Java getter/setter methods to represent JavaScript properties. This makes it easier to mock the interfaces in test code and gives the API a more "Java" feel. Although run-time type-checking is less strict because of the use of interfaces, this extra flexibility makes DOMjnate usable in unusual situations like having multiple global scopes (e.g. if you use iframes). DOMjnate is generated based on Microsoft's Typescript typing of the DOM API (with the intention of supplementing it WebIDL type information) while Elemental 2 is based on Google's Closure externs. The main advantage of DOMjnate over Elemental 2 though, is that in many cases, you can run and debug your code entirely from within Java without recompiling everything to JavaScript first.
+It is mainly intended as an alternative to [Elemental 2](https://github.com/google/elemental2). DOMjnate has different goals and use-cases than Elemental 2, resulting in a slightly different API. 
+
+* Elemental 2 uses real Java classes to represent JavaScript types and Java fields to represent JavaScript properties. This allows for proper run-time type checking and a Java API that feels more like the native JavaScript. 
+* DOMjnate uses only Java interfaces to represent JavaScript types and Java getter/setter methods to represent JavaScript properties. This makes it easier to mock the interfaces in test code and gives the API a more "Java" feel. Although run-time type-checking is less strict because of the use of interfaces, this extra flexibility makes DOMjnate usable in unusual situations like having multiple global scopes (e.g. if you use iframes). 
+* DOMjnate is generated based on Microsoft's Typescript typing of the DOM API (with the intention of supplementing it WebIDL type information) while Elemental 2 is based on Google's Closure externs.
+
+The main advantage of DOMjnate over Elemental 2 though, is that in many cases, you can run and debug your code entirely from within Java without recompiling everything to JavaScript first. 
 
 DOMjnate is primarily intended to be used with the GWT compiler. This lets you write all your code in Java, and then translate all your Java code into JavaScript to run things in a browser. But DOMjnate is also able to interface with the JavaFX webview and wrap all the JavaScript objects in the webview, so that you can run your Java code as normal Java code in a Java debugger without translating it to JavaScript first. Although this interfacing is a little clunky, it can potentially accelerate your development cycles because you don't need to compile your code to JavaScript everytime you want to debug your user interface. The same Java code will run the same in both your Java debugger and in a browser.
 
 ## Building
 
+DOMjnate was developed using Java 11 though it can probably also be compiled with Java 10 and possibly Java 9. It has been tested with JavaFX 11 and GWT 2.8.2. It uses `JsInterop` to describe its interfaces, so DOMjnate is likely compatible with j2cl as well. 
+
+Maven `pom.xml` build scripts are supplied for DOMjnate. To build DOMjnate, simply run 
+
+```
+mvn install
+```
+ 
+This will build three modules:
+
+- *domjnate-base* is a compatibility layer that allows the DOMjnate API to be used from GWT or directly from Java. 
+- *domjnate-api* contains the actual Java bindings for the HTML5 DOM API. 
+- *domjnate-javafx* is the module that lets DOMjnate be used directly in Java to control a JavaFX webview.
+ 
+After the modules have been built, you can grab the `.jar` files from the corresponding `target` directories and use them in your projects. If you are using Maven, you can also just add a Maven dependency on the modules in your projects.
+
 ### Generating the API
+
+The DOMjnate API is generated by the separate [DOMjnate Generator](https://github.com/my2iu/DomjnateGenerator) program. 
 
 ## Using DOM*j*nate in GWT
 
+To use DOMjnate in GWT, you must include the `domjnate-base` and `domjnate-api` libraries in your project. You also need to include `JsInterop` but that library is likely included by default in your project.
+
+In your `gwt.xml` file, you also need to specify dependencies on the domjnate libraries by adding these lines:
+
+```
+<inherits name='domjnate-base'/>
+<inherits name='domjnate-api'/>
+```
+
+Most of the DOMjnate APIs require you to have a reference to the JavaScript `window` object. DOMjnate, however, does not provide a means for getting access to that object though.
+
+You can use JSNI to write some JavaScript code for getting a reference to that object. For example, the code below gets the Window reference in the GWT entry point and then proceeds to set-up the UI: 
+
+```
+import com.google.gwt.core.client.EntryPoint;
+import com.user00.domjnate.api.Window;
+
+public class Program implements EntryPoint
+{
+  public void onModuleLoad()
+  {
+     Window win = win();
+     
+     // Start using the DOMjnate API here
+  }
+  
+  public static native Window win() /*-{
+     return $wnd;
+   }-*/;
+}
+
+```
+  
+  
+
 ## Using DOM*j*nate in Java
 
+DOMjnate provides a library for working with the JavaFX webview, allowing you to create an HTML5 user interface in that webview entirely from Java. JavaFX is compatible with AWT/Swing and SWT, so you can also use DOMjnate with those UI frameworks as well.
+
+To use DOMjnate in this way, you need to include the `domjnate-base`, `domjnate-api`, and `domjnate-javafx` libraries in your project. You also need to include JavaFX in your project, especially the `javafx-web` library which includes the JavaFX webview.
+
+You can then create a window with a webview widget. If you are using pure JavaFX, the code would look something like this:
+
+```
+public class Program extends javafx.application.Application
+{
+  public void start(Stage stage) throws MalformedURLException {
+    BorderPane border = new BorderPane();
+    WebView webView = new WebView();
+    border.setCenter(webView);
+    Scene scene = new Scene(border);
+    stage.setScene(scene);
+    stage.show();
+
+    WebEngine engine = webView.getEngine();
+    engine.getLoadWorker().stateProperty().addListener(
+        new ChangeListener<State>() {
+          public void changed(ObservableValue ov,
+              State oldState, State newState) {
+            if (newState == State.SUCCEEDED) {
+               onload(engine);
+            }
+          }
+        });
+    // Provide an initial .html file to load into the webview
+    engine.load(
+        new File("index.html").toURI().toURL().toExternalForm());
+  }
+
+  void onload(WebEngine engine)
+  {
+     // Page has loaded, and you can now safely
+     // start setting up your UI here
+  }
+
+  public static void main(String[] args)
+  {
+    launch(args);
+  }
+}
+```
+
+Most of the DOMjnate APIs require you to have a reference to the JavaScript `window` object. You can get a reference to the Window object of a webview using
+
+```
+JSObject jsWin = (JSObject)engine.executeScript("window");
+Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+```
+
+
 ## Making programs that run in both GWT and from Java
+
+## How to Use the API
+
+/it's evolving/
+
+### Static methods
+### Constructors
+### casting
