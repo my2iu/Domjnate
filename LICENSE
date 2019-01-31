@@ -1,6 +1,11 @@
-This code is generated from Microsoft's Typescript code. As that
-code is made available using the Apache 2.0 license, this code is
-also covered by that license.
+This code is generated from Microsoft's Typescript code and possibly 
+also from Mozilla's WebIDL code. Since the status of copyrights for 
+API code is unclear, you should assume that the generated code is 
+copyright Microsoft and Mozilla and is subject to the Microsoft's 
+Apache 2.0 license *AND* also Mozilla's MPLv2 license. All other code
+is also made available under the terms of those licenses.
+
+
 
 
                                  Apache License

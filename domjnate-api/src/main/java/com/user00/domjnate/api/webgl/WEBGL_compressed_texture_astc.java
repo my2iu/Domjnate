@@ -1,0 +1,68 @@
+package com.user00.domjnate.api.webgl;
+
+import jsinterop.annotations.JsMethod;
+import jsinterop.annotations.JsProperty;
+import jsinterop.annotations.JsType;
+
+@JsType(isNative=true,name="WEBGL_compressed_texture_astc")
+public interface WEBGL_compressed_texture_astc
+{
+@JsProperty(name="COMPRESSED_RGBA_ASTC_10x10_KHR")
+double getCOMPRESSED_RGBA_ASTC_10x10_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_10x5_KHR")
+double getCOMPRESSED_RGBA_ASTC_10x5_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_10x6_KHR")
+double getCOMPRESSED_RGBA_ASTC_10x6_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_10x8_KHR")
+double getCOMPRESSED_RGBA_ASTC_10x8_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_12x10_KHR")
+double getCOMPRESSED_RGBA_ASTC_12x10_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_12x12_KHR")
+double getCOMPRESSED_RGBA_ASTC_12x12_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_4x4_KHR")
+double getCOMPRESSED_RGBA_ASTC_4x4_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_5x4_KHR")
+double getCOMPRESSED_RGBA_ASTC_5x4_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_5x5_KHR")
+double getCOMPRESSED_RGBA_ASTC_5x5_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_6x5_KHR")
+double getCOMPRESSED_RGBA_ASTC_6x5_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_6x6_KHR")
+double getCOMPRESSED_RGBA_ASTC_6x6_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_8x5_KHR")
+double getCOMPRESSED_RGBA_ASTC_8x5_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_8x6_KHR")
+double getCOMPRESSED_RGBA_ASTC_8x6_KHR();
+@JsProperty(name="COMPRESSED_RGBA_ASTC_8x8_KHR")
+double getCOMPRESSED_RGBA_ASTC_8x8_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR();
+@JsProperty(name="COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR")
+double getCOMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR();
+@JsMethod(name="getSupportedProfiles")
+com.user00.domjnate.api.Array<String> getSupportedProfiles();
+}
