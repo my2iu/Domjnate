@@ -87,7 +87,6 @@ public class Program implements EntryPoint
      return $wnd;
    }-*/;
 }
-
 ```
   
   
@@ -139,6 +138,8 @@ public class Program extends javafx.application.Application
 }
 ```
 
+You should refer to the JavaFX documentation to see how to use JavaFX to open a webview inside a Swing or SWT program.
+
 Most of the DOMjnate APIs require you to have a reference to the JavaScript `window` object. You can get a reference to the Window object of a webview using
 
 ```
@@ -159,9 +160,71 @@ For the most part, these APIs can be used like normal Java interfaces. But the f
 
 ## Making programs that run in both GWT and from Java
 
+Since DOMjnate can be used with both GWT and the JavaFX webview, you can use DOMjnate to write code that works in both. This is particularly useful during development. You can make use of the quicker development cycles and easier debugging tools of Java for development since debugging things in GWT can be cumbersome at times. If you need CSS or HTML inspectors, you can revert back to GWT. And you can use GWT to compile all your code to JavaScript for final deployment.
+
+The entry points for a GWT program and a JavaFX program are different, so you would need different start-up classes for each version (they can coexist in the same project though). Once these entry points have finished setting up DOMjnate, they can then run code that is shared between the two versions. 
+
+```
+@GwtIncompatible
+public class ProgramJavaFx extends Application
+{
+  public void start(Stage stage) throws MalformedURLException {
+    BorderPane border = new BorderPane();
+    WebView webView = new WebView();
+    border.setCenter(webView);
+    Scene scene = new Scene(border);
+    stage.setScene(scene);
+    stage.show();
+
+    WebEngine engine = webView.getEngine();
+    engine.getLoadWorker().stateProperty().addListener(
+        new ChangeListener<State>() {
+          public void changed(ObservableValue ov,
+              State oldState, State newState) {
+            if (newState == State.SUCCEEDED) {
+               JSObject jsWin = (JSObject)engine.executeScript("window");
+               Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
+               ProgramShared.go(win);
+            }
+          }
+        });
+    // Load the main GWT html page here
+    engine.load(
+        new File("index.html").toURI().toURL().toExternalForm());
+  }
+
+  public static void main(String[] args)
+  {
+    launch(args);
+  }
+}
+
+public class ProgramGwt implements EntryPoint
+{
+  public void onModuleLoad()
+  {
+     Window win = win();
+     ProgramShared.go(win);
+  }
+  
+  public static native Window win() /*-{
+     return $wnd;
+   }-*/;
+}
+
+public class ProgramShared
+{
+  public static void go(Window win)
+  {
+    // Start your user interface
+  }
+}
+```
 
 
-## How to Use the API
+
+## API
+
 
 /it's evolving/
 
