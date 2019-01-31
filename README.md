@@ -146,9 +146,20 @@ JSObject jsWin = (JSObject)engine.executeScript("window");
 Window win = DomjnateFx.createJsBridgeGlobalsProxy(Window.class, jsWin);
 ```
 
+The DOMjnate APIs provide a Java interface to the standard JavaScript DOM APIs. DOMjnate uses Java's proxy functionality to provide "wrapper" classes that wrap JavaScript objects in the webview. When you make method calls on the DOMjnate API, the calls are forwarded to the corresponding JavaScript object, and the results are translated back to Java and returned.  
 
+For the most part, these APIs can be used like normal Java interfaces. But the fact that DOMjnate wraps JavaScript objects with Java proxy objects does lead to some unusual behavior.
+
+<!-- TODO: Include diagram of wrapper objects -->
+
+- DOMjnate does not check the real types of JavaScript objects. Any JavaScript object can be "wrapped" by DOMjnate so that it looks like it supports any interface regardless of whether that JavaScript object actually supports that interface or not.
+- Since you are working with Java wrappers over JavaScript objects and not directly working with the real JavaScript objects themselves,  it's possible to have different wrappers for the same JavaScript object. This means that a JavaScript object might be represented in Java by different wrapper objects. If you compare those Java objects using `==`, it will claim that the objects are different, even though the wrapper objects still refer to the same underlying JavaScript object.
+- Regardless of the underlying type of the JavaScript object, the only supported interfaces available in Java are those provided by the wrapper object. If you need to downcast a Java reference to a subtype, you often need a new wrapper object that exports the extra functionality of the underlying JavaScript object. To get a new wrapper object, you can use the command `com.user00.domjnate.util.Js.cast(obj, NewInterface.class)` command. This will return a new wrapper object for `obj` that supports the `NewInterface` interface. So, essentially, anywhere in Java where you would cast a DOMjnate object, such as `NewInterface newIntf = (NewInterface)obj;`, you should change it to `NewInterface newIntf = Js.cast(obj, NewInterface.class);`.
+- The JavaFX webview is missing some functionality of a full browser. Even though DOMjnate provides methods and interfaces for most browser APIs, those APIs might not actually exist in the JavaFX webview.  
 
 ## Making programs that run in both GWT and from Java
+
+
 
 ## How to Use the API
 
