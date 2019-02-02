@@ -24,13 +24,13 @@ T getValue();
 @JsProperty(name="value")
 void setValue(T val);
 @JsProperty(name="get")
-GetCallback getGet();
+GetCallback<T> getGet();
 @JsProperty(name="get")
-void setGet(GetCallback val);
+void setGet(GetCallback<T> val);
 @JsProperty(name="set")
-SetCallback getSet();
+SetCallback<T> getSet();
 @JsProperty(name="set")
-void setSet(SetCallback val);
+void setSet(SetCallback<T> val);
 @JsFunction public static interface GetCallback<T> 
 {
 T apply();

@@ -66,7 +66,7 @@ public static Promise<Void> resolve(com.user00.domjnate.api.WindowOrWorkerGlobal
   return com.user00.domjnate.util.Js.callStaticMethod(_win, "Promise", "resolve", Promise.class);
 }
 @JsOverlay
-public static <T> Promise<T> _new(com.user00.domjnate.api.WindowOrWorkerGlobalScope _win, PromiseCallback executor) {
+public static <T> Promise<T> _new(com.user00.domjnate.api.WindowOrWorkerGlobalScope _win, PromiseCallback<T> executor) {
   java.lang.Object constructor = com.user00.domjnate.util.Js.getConstructor(_win, "Promise");
   return com.user00.domjnate.util.Js.construct(_win, constructor, Promise.class, executor);
 }

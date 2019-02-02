@@ -8,23 +8,23 @@ import jsinterop.annotations.JsType;
 public interface CallableFunction extends Function
 {
 @JsMethod(name="apply")
-<T,R> R apply(ApplyCallback _this, T thisArg);
+<T,R> R apply(ApplyCallback<R, T> _this, T thisArg);
 @JsMethod(name="apply")
-<T,A,R> R apply(ApplyCallback0 _this, T thisArg, A args);
+<T,A,R> R apply(ApplyCallback0<R, A, T> _this, T thisArg, A args);
 @JsMethod(name="call")
-<T,A,R> R call(CallCallback _this, T thisArg, A... args);
+<T,A,R> R call(CallCallback<R, A, T> _this, T thisArg, A... args);
 @JsMethod(name="bind")
-<T,A,R> BindCallback bind(BindCallback0 _this, T thisArg);
+<T,A,R> BindCallback<R, A> bind(BindCallback0<R, A, T> _this, T thisArg);
 @JsMethod(name="bind")
-<T,A0,A,R> BindCallback1 bind(BindCallback2 _this, T thisArg, A0 arg0);
+<T,A0,A,R> BindCallback1<R, A> bind(BindCallback2<R, A, T, A0> _this, T thisArg, A0 arg0);
 @JsMethod(name="bind")
-<T,A0,A1,A,R> BindCallback3 bind(BindCallback4 _this, T thisArg, A0 arg0, A1 arg1);
+<T,A0,A1,A,R> BindCallback3<R, A> bind(BindCallback4<R, A, T, A0, A1> _this, T thisArg, A0 arg0, A1 arg1);
 @JsMethod(name="bind")
-<T,A0,A1,A2,A,R> BindCallback5 bind(BindCallback6 _this, T thisArg, A0 arg0, A1 arg1, A2 arg2);
+<T,A0,A1,A2,A,R> BindCallback5<R, A> bind(BindCallback6<R, A, T, A0, A1, A2> _this, T thisArg, A0 arg0, A1 arg1, A2 arg2);
 @JsMethod(name="bind")
-<T,A0,A1,A2,A3,A,R> BindCallback7 bind(BindCallback8 _this, T thisArg, A0 arg0, A1 arg1, A2 arg2, A3 arg3);
+<T,A0,A1,A2,A3,A,R> BindCallback7<R, A> bind(BindCallback8<R, A, T, A0, A1, A2, A3> _this, T thisArg, A0 arg0, A1 arg1, A2 arg2, A3 arg3);
 @JsMethod(name="bind")
-<T,AX,R> BindCallback9 bind(BindCallback10 _this, T thisArg, AX... args);
+<T,AX,R> BindCallback9<R, AX> bind(BindCallback10<R, AX, T> _this, T thisArg, AX... args);
 @JsFunction public static interface BindCallback5<R,A> 
 {
 R apply(A... args);

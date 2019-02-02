@@ -70,13 +70,13 @@ double reduce(ReduceCallback callbackfn);
 @JsMethod(name="reduce")
 double reduce(ReduceCallback0 callbackfn, double initialValue);
 @JsMethod(name="reduce")
-<U> U reduce(ReduceCallback1 callbackfn, U initialValue);
+<U> U reduce(ReduceCallback1<U> callbackfn, U initialValue);
 @JsMethod(name="reduceRight")
 double reduceRight(ReduceRightCallback callbackfn);
 @JsMethod(name="reduceRight")
 double reduceRight(ReduceRightCallback0 callbackfn, double initialValue);
 @JsMethod(name="reduceRight")
-<U> U reduceRight(ReduceRightCallback1 callbackfn, U initialValue);
+<U> U reduceRight(ReduceRightCallback1<U> callbackfn, U initialValue);
 @JsMethod(name="reverse")
 Int32Array reverse();
 @JsMethod(name="set")

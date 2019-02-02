@@ -38,33 +38,33 @@ double lastIndexOf(T searchElement);
 @JsMethod(name="lastIndexOf")
 double lastIndexOf(T searchElement, double fromIndex);
 @JsMethod(name="every")
-boolean every(EveryCallback callbackfn);
+boolean every(EveryCallback<T> callbackfn);
 @JsMethod(name="every")
-boolean every(EveryCallback callbackfn, java.lang.Object thisArg);
+boolean every(EveryCallback<T> callbackfn, java.lang.Object thisArg);
 @JsMethod(name="some")
-boolean some(SomeCallback callbackfn);
+boolean some(SomeCallback<T> callbackfn);
 @JsMethod(name="some")
-boolean some(SomeCallback callbackfn, java.lang.Object thisArg);
+boolean some(SomeCallback<T> callbackfn, java.lang.Object thisArg);
 @JsMethod(name="forEach")
-void forEach(ForEachCallback0 callbackfn);
+void forEach(ForEachCallback0<T> callbackfn);
 @JsMethod(name="forEach")
-void forEach(ForEachCallback0 callbackfn, java.lang.Object thisArg);
+void forEach(ForEachCallback0<T> callbackfn, java.lang.Object thisArg);
 @JsMethod(name="map")
-<U> Array<U> map(MapCallback callbackfn);
+<U> Array<U> map(MapCallback<U, T> callbackfn);
 @JsMethod(name="map")
-<U> Array<U> map(MapCallback callbackfn, java.lang.Object thisArg);
+<U> Array<U> map(MapCallback<U, T> callbackfn, java.lang.Object thisArg);
 @JsMethod(name="filter")
-Array<T> filter(FilterCallback callbackfn);
+Array<T> filter(FilterCallback<T> callbackfn);
 @JsMethod(name="filter")
-Array<T> filter(FilterCallback callbackfn, java.lang.Object thisArg);
+Array<T> filter(FilterCallback<T> callbackfn, java.lang.Object thisArg);
 @JsMethod(name="reduce")
-T reduce(ReduceCallback callbackfn);
+T reduce(ReduceCallback<T> callbackfn);
 @JsMethod(name="reduce")
-<U> U reduce(ReduceCallback0 callbackfn, U initialValue);
+<U> U reduce(ReduceCallback0<U, T> callbackfn, U initialValue);
 @JsMethod(name="reduceRight")
-T reduceRight(ReduceRightCallback callbackfn);
+T reduceRight(ReduceRightCallback<T> callbackfn);
 @JsMethod(name="reduceRight")
-<U> U reduceRight(ReduceRightCallback0 callbackfn, U initialValue);
+<U> U reduceRight(ReduceRightCallback0<U, T> callbackfn, U initialValue);
 @JsOverlay
 public default T get(double n, Class<T> _type) {
   return (T)com.user00.domjnate.util.Js.getIndex(this, n, _type);

@@ -16,9 +16,9 @@ void setLength(double val);
 @JsMethod(name="item")
 TNode item(double index);
 @JsMethod(name="forEach")
-void forEach(ForEachCallback0 callbackfn);
+void forEach(ForEachCallback0<TNode> callbackfn);
 @JsMethod(name="forEach")
-void forEach(ForEachCallback0 callbackfn, java.lang.Object thisArg);
+void forEach(ForEachCallback0<TNode> callbackfn, java.lang.Object thisArg);
 @JsOverlay
 public default TNode get(double index, Class<TNode> _type) {
   return (TNode)com.user00.domjnate.util.Js.getIndex(this, index, _type);
