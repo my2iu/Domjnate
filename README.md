@@ -88,8 +88,11 @@ public class Program implements EntryPoint
    }-*/;
 }
 ```
-  
-  
+
+Because you are working with JavaScript objects instead of Java objects, you may encounter some unexpected behavior:
+
+- Your compiled GWT code may throw a NullPointerException when casting from one JavaScript type to another. This happens because GWT statically analyzes the Java types in your program and concludes that there are no Java types that can be cast that way, so GWT replaces the cast with a null pointer. With DOMjnate, you are working with JavaScript objects, and it *is* possible to cast any JavaScript object to any other type. To avoid this issue, you can use the command `com.user00.domjnate.util.Js.cast(obj, NewInterface.class)` to cast between unrelated JavaScript types.
+
 
 ## Using DOM*j*nate in Java
 
@@ -238,6 +241,17 @@ When calling a DOMjnate static method, you also need to supply a `Window` object
 ### Constants
 
 Most JavaScript constants are standardized and well-defined, so they could have been embedded directly in the Java code. To be safe though, DOMjnate instead provides methods for reading out the constant value from JavaScript. Like a static method, programmers must supply a `Window` object so that DOMjnate knows which scope to read the constant from. To reduce verbiage, although constants are considered getters, the word `get` is not added to the front of the method names. 
+
+### Function objects
+
+Some API methods take a `Function` object as a parameter. To make a `Function` object from Java, you can take any interface with the `@JsFunction` annotation and then convert it to a JavaScript Function using the `com.user00.domjnate.util.Js.lambdaAsFunction()` method. Below is an example of how to use the method:
+
+```
+VoidFunction func = () -> { 
+  // Code for lambda
+}
+Function jsFunc = (Function)Js.lambdaAsFunction(win, func);
+```
 
 ### Performance
 
